@@ -5,7 +5,7 @@ import gym.spaces
 import numpy as np
 
 from ..memory import register_online_env
-from . import fetch_envs
+from . import fetch_envs, tabletop_manipulation
 
 
 class GoalCondEnvWrapper(gym.ObservationWrapper):
@@ -63,6 +63,8 @@ name_img_env = [
     ('FetchPush', False, fetch_envs.FetchPushEnv),
     ('FetchPushImage', True, fetch_envs.FetchPushImage),
     ('FetchSlide', False, fetch_envs.FetchSlideEnv),
+    ('TabletopManipulation', False, tabletop_manipulation.TabletopManipulation),
+    ('TabletopManipulationImage', True, tabletop_manipulation.TabletopManipulationImage),
 ]
 
 
