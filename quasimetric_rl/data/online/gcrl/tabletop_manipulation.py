@@ -149,7 +149,7 @@ class TabletopManipulation(MujocoEnv):
     next_obs = self._get_obs()
     reward = self.compute_reward(next_obs)
     done = False
-    info = {'is_success': self.is_successful(obs=next_obs)}
+    info = {'is_success': bool(self.is_successful(obs=next_obs))}
     return next_obs, reward, done, info
 
   def move(self, action):
@@ -221,7 +221,7 @@ class TabletopManipulation(MujocoEnv):
       reward += -grip_to_object
       reward += 0.5 * np.exp(-(grip_to_object**2) / 0.01)
 
-    return np.squeeze(reward)
+    return float(reward)
 
   def get_obs(self):
     return self._get_obs()
@@ -273,22 +273,22 @@ class TabletopManipulationImage(TabletopManipulation):
     # self.observation_space = self._new_observation_space
     img = self.observation(s)
 
-    return {'observation': img, 'desired_goal': self._goal_img}
+    return np.concatenate([img, self._goal_img])
   
   def step(self, action):
     if self.reset_atleast_once:
       s, _, _, _ = super(TabletopManipulationImage, self).step(action)
       done = False
       r = self.compute_reward(s)
-      info = {'is_success': self.is_successful(obs=s)}
+      info = {'is_success': bool(self.is_successful(obs=s))}
       img = self.observation(s)
-      return {'observation': img, 'desired_goal': self._goal_img}, r, done, info
+      return np.concatenate([img, self._goal_img]), r, done, info
     else: # workaround for MujocoEnv initialization
       return super(TabletopManipulationImage, self).step(action)
 
   def observation(self, observation):
     img = self.render(mode='rgb_array', height=64, width=64)
-    return img.transpose(2,0,1) # HWC -> CHW
+    return img.flatten()
 
   def viewer_setup(self):
     super(TabletopManipulationImage, self).viewer_setup()
